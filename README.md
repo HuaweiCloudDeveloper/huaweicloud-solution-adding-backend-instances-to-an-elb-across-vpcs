@@ -33,7 +33,7 @@ huaweicloud-solution-adding-backend-instances-to-an-elb-across-vpcs
 1. Log in to the EIP console, create two EIPs, and bind them respectively to the two ECSs created as instructed in *Section 3.2 Quick Deployment* of the deployment guide.
 
     Figure 1 Creating EIPs
-    ![Creating EIPs](./document/readme-image-001.PNG)
+    ![Creating EIPs](./document/readme-image-001.png)
 
 2. Log in to the two ECSs created as instructed in *Section 3.2 Quick Deployment* of the deployment guide, deploy the httpd service on each ECS, and run the command below. Note that you can configure the message in the double quotation marks in the second line whatever you like. If the load balancer routes the request to the ECSs, this message will be returned.
 
@@ -48,18 +48,18 @@ huaweicloud-solution-adding-backend-instances-to-an-elb-across-vpcs
 	curl localhost
 
 	Figure 2 Logging in to the ECSs
-	![Logging in to the ECSs](./document/readme-image-002.PNG)
+	![Logging in to the ECSs](./document/readme-image-002.png)
 
 	Figure 3 Installing the httpd service
-	![Installing the httpd service](./document/readme-image-003.PNG)
+	![Installing the httpd service](./document/readme-image-003.png)
 
 	Figure 4 Installing the httpd service
-	![Installing the httpd service](./document/readme-image-004.PNG)
+	![Installing the httpd service](./document/readme-image-004.png)
 
 3. Unbind the EIPs bound to the two ECSs in step 2 and release the EIPs.
 
 	Figure 5 Unbinding and releasing the EIPs
-	![Unbinding and releasing the EIPs](./document/readme-image-005.PNG)
+	![Unbinding and releasing the EIPs](./document/readme-image-005.png)
 
 4. On the ELB console, view the dedicated load balancer you have created for deploying this solution.
 
@@ -70,11 +70,11 @@ huaweicloud-solution-adding-backend-instances-to-an-elb-across-vpcs
 
 	Figure 7 Verifying that the request is routed to one ECS
 
-	![Verifying that the request is routed to one ECS](./document/readme-image-007.PNG)
+	![Verifying that the request is routed to one ECS](./document/readme-image-007.png)
 
 	Figure 8 Verifying that the request is routed to the other ECS
 
-	![Verifying that the request is routed to the other ECS](./document/readme-image-008.PNG)
+	![Verifying that the request is routed to the other ECS](./document/readme-image-008.png)
 
 
 
