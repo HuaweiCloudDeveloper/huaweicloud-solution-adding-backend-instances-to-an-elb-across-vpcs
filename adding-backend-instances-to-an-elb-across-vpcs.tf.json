@@ -1,4 +1,4 @@
-{
+﻿{
     "terraform": {
         "required_providers": [
             {
@@ -17,7 +17,6 @@
                 "dns": "dns.ap-southeast-3.myhuaweicloud.com",
                 "bss": "bss-intl.ap-southeast-3.myhuaweicloud.com"
             },
-            "enterprise_project_id": "9200eae2-a9b2-4ebf-9df1-4c77fb88046d",
             "insecure": true,
             "region": "ap-southeast-3",
             "auth_url": "https://iam.ap-southeast-3.myhuaweicloud.com/v3"
