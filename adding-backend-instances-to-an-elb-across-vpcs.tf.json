@@ -45,11 +45,11 @@
         },
         "ecs_name": {
             "default": "cross-vpc-backend-to-elb-demo",
-            "description": "ECS name, which must be unique. The name can contain 1 to 59 characters, including letters, digits, underscores (_), hyphens (-), and periods (.). The default name is cross-vpc-backend-to-elb-demo.",
+            "description": "ECS name, which must be unique. The name can contain 1 to 53 characters, including letters, digits, underscores (_), hyphens (-), and periods (.). The default name is cross-vpc-backend-to-elb-demo.",
             "type": "string",
             "nullable": "false",
             "validation": {
-                "condition": "${length(regexall(\"^[\\\\w\\\\.-]{1,59}$\",var.ecs_name))>0}",
+                "condition": "${length(regexall(\"^[\\\\w\\\\.-]{1,53}$\",var.ecs_name))>0}",
                 "error_message": "Invalid input. Please re-enter."
             }
         },
