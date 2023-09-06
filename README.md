@@ -4,7 +4,7 @@
 ===============
 If you deploy services on multiple servers in different VPCs, you can use ELB to route traffic to backend servers in different VPCs connected over a VPC peering connection.
 
-For details, visit https://www.huaweicloud.com/solution/implementations/adding-backend-instances-to-an-elb-across-vpcs.html.
+For details, visit https://www.huaweicloud.com/intl/en-us/solution/implementations/rtbsdvpc.html.
 
 **Solution Architecture**
 ---------------
@@ -64,7 +64,7 @@ huaweicloud-solution-adding-backend-instances-to-an-elb-across-vpcs
 4. On the ELB console, view the dedicated load balancer you have created for deploying this solution.
 
 	Figure 6 Viewing the load balancer
-	![Viewing the load balancer](./document/readme-image-006.PNG)
+	![Viewing the load balancer](./document/readme-image-006.png)
 
 5. Enter the EIP address assigned in step 4 in the address box of your browser to access the dedicated load balancer. If the following two pages are displayed, the load balancer routes the requests to the two ECSs.
 
