@@ -1,0 +1,309 @@
+﻿{
+    "terraform": {
+        "required_providers": [
+            {
+                "huaweicloud": {
+                    "source": "huawei.com/provider/huaweicloud",
+                    "version": "1.50.0"
+                }
+            }
+        ]
+    },
+    "provider": {
+        "huaweicloud": {
+            "cloud": "myhuaweicloud.com",
+            "endpoints": {
+                "iam": "iam.ap-southeast-3.myhuaweicloud.com",
+                "dns": "dns.ap-southeast-3.myhuaweicloud.com",
+                "bss": "bss-intl.ap-southeast-3.myhuaweicloud.com"
+            },
+            "insecure": true,
+            "region": "ap-southeast-3",
+            "auth_url": "https://iam.ap-southeast-3.myhuaweicloud.com/v3"
+        }
+    },
+    "variable": {
+        "vpc_name": {
+            "default": "cross-vpc-backend-to-elb-demo",
+            "description": "Virtual Private Cloud (VPC) name. This template uses a newly created VPC and the VPC name must be unique. The name can contain 1 to 56 characters, including letters, digits, underscores (_), hyphens (-), and periods (.). The default name is cross-vpc-backend-to-elb-demo.",
+            "type": "string",
+            "nullable": "false"
+        },
+        "secgroup_name": {
+            "default": "cross-vpc-backend-to-elb-demo",
+            "description": "Security group name. This template uses a newly created security group. For details about how to configure a security group rule, see the deployment guide. The value can contain 1 to 62 characters, including letters, digits, underscores (_), hyphens (-), and periods (.). The default name is cross-vpc-backend-to-elb-demo.",
+            "type": "string",
+            "nullable": "false"
+        },
+        "ecs_name": {
+            "default": "cross-vpc-backend-to-elb-demo",
+            "description": "ECS name, which must be unique. The name can contain 1 to 59 characters, including letters, digits, underscores (_), hyphens (-), and periods (.). The default name is cross-vpc-backend-to-elb-demo.",
+            "type": "string",
+            "nullable": "false",
+            "validation": {
+                "condition": "${length(regexall(\"^[\\\\w\\\\.-]{1,53}$\",var.ecs_name))>0}",
+                "error_message": "Invalid input. Please re-enter."
+            }
+        },
+        "ecs_flavor": {
+            "default": "s6.small.1",
+            "description": "ECS flavor. For more flavors, see the deployment guide. The default flavor is s6.small.1 (s6|1 vCPU|1 GiB).",
+            "type": "string",
+            "nullable": "false",
+            "validation": {
+                "condition": "${length(regexall(\"^([a-z][a-z0-9]{1,3}\\\\.)(small\\\\.|medium\\\\.|(x||[1-9][0-9]{0,1}x)large\\\\.)[1-9][0-9]{0,1}$\",var.ecs_flavor))>0}",
+                "error_message": "Invalid input. Please re-enter."
+            }
+        },
+        "ecs_password": {
+            "default": "",
+            "description": "Initial password of the ECS. Log in to the ECS console to change the password by following the instructions provided in deployment guide. The password can contain 8 to 26 characters, including at least three of the following character types: uppercase letters, lowercase letters, digits, and special characters (!@$%^-_=+[{}]:,./?). Passwords cannot contain any username or the username spelled backwards. The administrator username is root.",
+            "type": "string",
+            "nullable": "false",
+            "sensitive": "true"
+        },
+        "charging_mode": {
+            "default": "postPaid",
+            "description": "Billing mode. The value can be prePaid (yearly/monthly) or postPaid (pay-per-use). The default value is postPaid.",
+            "type": "string",
+            "nullable": "false",
+            "validation": {
+                "condition": "${contains([\"postPaid\",\"prePaid\"], var.charging_mode)}",
+                "error_message": "Invalid input, please re-enter."
+            }
+        },
+        "charging_unit": {
+            "default": "month",
+            "description": "Billing period type. The value can be year or month. This parameter is mandatory when charging_mode is set to prePaid. The default value is month.",
+            "type": "string",
+            "nullable": "false",
+            "validation": {
+                "condition": "${contains([\"month\",\"year\"], var.charging_unit)}",
+                "error_message": "Invalid input, please re-enter."
+            }
+        },
+        "charging_period": {
+            "default": 1,
+            "description": "Billing period. When charging_unit is set to year, the value ranges from 1 to 3. When charging_unit is set to month, the value ranges from 1 to 9. This parameter is mandatory when charging_mode is set to prePaid. The default value is 1.",
+            "type": "number",
+            "nullable": "false",
+            "validation": {
+                "condition": "${length(regexall(\"^[1-9]$\",var.charging_period))>0}",
+                "error_message": "Invalid input, please re-enter."
+            }
+        }
+    },
+    "data": {
+        "huaweicloud_availability_zones": {
+            "availability_zones": {}
+        },
+        "huaweicloud_images_image": {
+            "centos": {
+                "most_recent": true,
+                "name": "CentOS 8.2 64bit",
+                "visibility": "public"
+            }
+        }
+    },
+    "resource": {
+        "huaweicloud_vpc": {
+            "vpc_1": {
+                "cidr": "172.18.0.0/16",
+                "name": "${var.vpc_name}_vpc1"
+            },
+            "vpc_2": {
+                "cidr": "172.17.0.0/16",
+                "name": "${var.vpc_name}_vpc2"
+            }
+        },
+        "huaweicloud_vpc_subnet": {
+            "vpc_subnet_1": {
+                "cidr": "172.18.1.0/25",
+                "gateway_ip": "172.18.1.1",
+                "name": "${var.vpc_name}_subnet1",
+                "vpc_id": "${huaweicloud_vpc.vpc_1.id}"
+            },
+            "vpc_subnet_2": {
+                "cidr": "172.17.0.0/25",
+                "gateway_ip": "172.17.0.1",
+                "name": "${var.vpc_name}_subnet2",
+                "vpc_id": "${huaweicloud_vpc.vpc_2.id}"
+            }
+        },
+        "huaweicloud_networking_secgroup": {
+            "networking_secgroup_1": {
+                "name": "${var.secgroup_name}_1"
+            },
+            "networking_secgroup_2": {
+                "name": "${var.secgroup_name}_2"
+            }
+        },
+        "huaweicloud_networking_secgroup_rule": {
+            "secgroup_rule_ping": {
+                "description": "Allows to test the ECS connectivity with the ping command.",
+                "direction": "ingress",
+                "ethertype": "IPv4",
+                "protocol": "icmp",
+                "remote_ip_prefix": "0.0.0.0/0",
+                "security_group_id": "${huaweicloud_networking_secgroup.networking_secgroup_1.id}"
+            },
+            "secgroup_rule_ping_2": {
+                "description": "Allows to test the ECS connectivity with the ping command.",
+                "direction": "ingress",
+                "ethertype": "IPv4",
+                "protocol": "icmp",
+                "remote_ip_prefix": "0.0.0.0/0",
+                "security_group_id": "${huaweicloud_networking_secgroup.networking_secgroup_2.id}"
+            },
+            "allow_all_1": {
+                "description": "允许用户通过浏览器登录",
+                "direction": "ingress",
+                "ethertype": "IPv4",
+                "ports": 80,
+                "protocol": "tcp",
+                "remote_ip_prefix": "0.0.0.0/0",
+                "security_group_id": "${huaweicloud_networking_secgroup.networking_secgroup_1.id}"
+            },
+            "allow_all_2": {
+                "description": "允许用户通过浏览器登录",
+                "direction": "ingress",
+                "ethertype": "IPv4",
+                "ports": 80,
+                "protocol": "tcp",
+                "remote_ip_prefix": "0.0.0.0/0",
+                "security_group_id": "${huaweicloud_networking_secgroup.networking_secgroup_2.id}"
+            }
+        },
+        "huaweicloud_compute_instance": {
+            "ecs_1": {
+                "availability_zone": "${data.huaweicloud_availability_zones.availability_zones.names[0]}",
+                "count": 1,
+                "flavor_id": "${var.ecs_flavor}",
+                "image_id": "${data.huaweicloud_images_image.centos.id}",
+                "name": "${var.ecs_name}_000${count.index+1}",
+                "admin_pass": "${var.ecs_password}",
+                "network": {
+                    "uuid": "${huaweicloud_vpc_subnet.vpc_subnet_1.id}"
+                },
+                "security_group_ids": [
+                    "${huaweicloud_networking_secgroup.networking_secgroup_1.id}"
+                ],
+                "system_disk_size": 40,
+                "system_disk_type": "SSD",
+                "charging_mode": "${var.charging_mode}",
+                "period_unit": "${var.charging_unit}",
+                "period": "${var.charging_period}"
+            },
+            "ecs_2": {
+                "availability_zone": "${data.huaweicloud_availability_zones.availability_zones.names[0]}",
+                "count": 1,
+                "flavor_id": "${var.ecs_flavor}",
+                "image_id": "${data.huaweicloud_images_image.centos.id}",
+                "name": "${var.ecs_name}_001${count.index+1}",
+                "admin_pass": "${var.ecs_password}",
+                "network": {
+                    "uuid": "${huaweicloud_vpc_subnet.vpc_subnet_2.id}",
+                    "fixed_ip_v4": "172.17.0.25"
+                },
+                "security_group_ids": [
+                    "${huaweicloud_networking_secgroup.networking_secgroup_2.id}"
+                ],
+                "system_disk_size": 40,
+                "system_disk_type": "SSD",
+                "charging_mode": "${var.charging_mode}",
+                "period_unit": "${var.charging_unit}",
+                "period": "${var.charging_period}"
+
+            }
+        },
+        "huaweicloud_vpc_eip": {
+            "vpc_eip": {
+                "charging_mode": "${var.charging_mode}",
+                "period_unit": "${var.charging_unit}",
+                "period": "${var.charging_period}",
+                "bandwidth": {
+                    "charge_mode": "bandwidth",
+                    "name": "${var.ecs_name}_bandwidth1",
+                    "share_type": "PER",
+                    "size": "5"
+                },
+                "publicip": {
+                    "type": "5_bgp"
+                }
+            }
+        },
+        "huaweicloud_vpc_peering_connection": {
+            "vpc_peering_connection": {
+                "name": "peer_demo",
+                "vpc_id": "${huaweicloud_vpc.vpc_1.id}",
+                "peer_vpc_id": "${huaweicloud_vpc.vpc_2.id}"
+            }
+        },
+        "huaweicloud_vpc_route": {
+            "vpc_route_1": {
+                "vpc_id": "${huaweicloud_vpc.vpc_1.id}",
+                "destination": "172.17.0.0/16",
+                "type": "peering",
+                "nexthop": "${huaweicloud_vpc_peering_connection.vpc_peering_connection.id}"
+            },
+            "vpc_route_2": {
+                "vpc_id": "${huaweicloud_vpc.vpc_2.id}",
+                "destination": "172.18.0.0/16",
+                "type": "peering",
+                "nexthop": "${huaweicloud_vpc_peering_connection.vpc_peering_connection.id}"
+            }
+        },
+        "huaweicloud_elb_loadbalancer": {
+            "elb": {
+                "name": "${var.vpc_name}_elb",
+                "availability_zone": ["ap-southeast-3a","ap-southeast-3b"],
+                "vpc_id": "${huaweicloud_vpc.vpc_1.id}",
+                "ipv4_subnet_id": "${huaweicloud_vpc_subnet.vpc_subnet_1.subnet_id}",
+                "cross_vpc_backend": "true",
+                "ipv4_eip_id": "${huaweicloud_vpc_eip.vpc_eip.id}"
+            }
+        },
+        "huaweicloud_elb_listener": {
+            "listener_http": {
+                "loadbalancer_id": "${huaweicloud_elb_loadbalancer.elb.id}",
+                "protocol": "HTTP",
+                "protocol_port": 80
+            }
+        },
+        "huaweicloud_elb_member": {
+            "member_1": {
+                "address": "${huaweicloud_compute_instance.ecs_1[count.index].access_ip_v4}",
+                "count": 1,
+                "pool_id": "${huaweicloud_elb_pool.group_http.id}",
+                "protocol_port": 80,
+                "subnet_id": "${huaweicloud_vpc_subnet.vpc_subnet_1.subnet_id}",
+                "weight": 1
+            },
+            "member_2": {
+                "address": "172.17.0.25",
+                "pool_id": "${huaweicloud_elb_pool.group_http.id}",
+                "subnet_id": "",
+                "protocol_port": 80,
+                "weight": 1
+            }
+        },
+        "huaweicloud_elb_monitor": {
+            "monitor_http": {
+                "max_retries": 10,
+                "pool_id": "${huaweicloud_elb_pool.group_http.id}",
+                "timeout": 15,
+                "url_path": "/",
+                "protocol": "HTTP",
+                "interval": 30
+            }
+        },
+        "huaweicloud_elb_pool": {
+            "group_http": {
+                "lb_method": "ROUND_ROBIN",
+                "listener_id": "${huaweicloud_elb_listener.listener_http.id}",
+                "name": "group_http",
+                "protocol": "HTTP"
+            }
+        }
+    }
+}
