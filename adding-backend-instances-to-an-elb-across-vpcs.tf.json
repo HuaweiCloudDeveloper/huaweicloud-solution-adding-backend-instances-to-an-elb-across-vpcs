@@ -28,16 +28,24 @@
             "description": "Virtual Private Cloud (VPC) name. This template uses a newly created VPC and the VPC name must be unique. The name can contain 1 to 56 characters, including letters, digits, underscores (_), hyphens (-), and periods (.). The default name is cross-vpc-backend-to-elb-demo.",
             "type": "string",
             "nullable": "false"
+            "validation": {
+                "condition": "${length(regexall(\"^[\\\\w\\\\.-]{1,56}$\",var.vpc_name))>0}",
+                "error_message": "Invalid input. Please re-enter."
+            }
         },
         "secgroup_name": {
             "default": "cross-vpc-backend-to-elb-demo",
             "description": "Security group name. This template uses a newly created security group. For details about how to configure a security group rule, see the deployment guide. The value can contain 1 to 62 characters, including letters, digits, underscores (_), hyphens (-), and periods (.). The default name is cross-vpc-backend-to-elb-demo.",
             "type": "string",
             "nullable": "false"
+            "validation": {
+                "condition": "${length(regexall(\"^[\\\\w\\\\.-]{1,62}$\",var.secgroup_name))>0}",
+                "error_message": "Invalid input. Please re-enter."
+            }
         },
         "ecs_name": {
             "default": "cross-vpc-backend-to-elb-demo",
-            "description": "ECS name, which must be unique. The name can contain 1 to 59 characters, including letters, digits, underscores (_), hyphens (-), and periods (.). The default name is cross-vpc-backend-to-elb-demo.",
+            "description": "ECS name, which must be unique. The name can contain 1 to 53 characters, including letters, digits, underscores (_), hyphens (-), and periods (.). The default name is cross-vpc-backend-to-elb-demo.",
             "type": "string",
             "nullable": "false",
             "validation": {
@@ -156,7 +164,7 @@
                 "security_group_id": "${huaweicloud_networking_secgroup.networking_secgroup_2.id}"
             },
             "allow_all_1": {
-                "description": "允许用户通过浏览器登录",
+                "description": "Allows users to log in using a browser",
                 "direction": "ingress",
                 "ethertype": "IPv4",
                 "ports": 80,
@@ -165,7 +173,7 @@
                 "security_group_id": "${huaweicloud_networking_secgroup.networking_secgroup_1.id}"
             },
             "allow_all_2": {
-                "description": "允许用户通过浏览器登录",
+                "description": "Allows users to log in using a browser",
                 "direction": "ingress",
                 "ethertype": "IPv4",
                 "ports": 80,
