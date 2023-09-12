@@ -9,7 +9,7 @@ For details, visit https://www.huaweicloud.com/intl/en-us/solution/implementatio
 **Solution Architecture**
 ---------------
 
-![Architecture](http://image.huawei.com/tiny-lts/v1/images/45170a864cc81c189c5fac6f24fa8cec_1169x712.png)
+![Architecture](./document/adding-backend-instances-to-an-elb-across-vpcs.png)
 
 **Architecture Overview**
 ---------------
